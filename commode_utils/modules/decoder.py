@@ -72,8 +72,8 @@ class Decoder(nn.Module):
             current_output, current_attention, decoder_state = self._decoder_step(
                 current_input, batched_encoder_output, attention_mask, decoder_state
             )
-            if step == 1:
-                print('Random number', current_output[0][0:10], current_output.shape)
+            #if step == 1:
+                #print('Random number', current_output[0][0:10], current_output.shape)
             print(f'before current_input {current_input}')
             #print(f'before current_output {current_output}')
             #print(f'before current_output size {current_output.shape}')
