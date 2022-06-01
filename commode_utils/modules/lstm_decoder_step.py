@@ -24,6 +24,7 @@ class LSTMDecoderStep(BaseDecoderStep):
             dropout=config.rnn_dropout if config.decoder_num_layers > 1 else 0,
             batch_first=True,
         )
+        print(f'LSTMDecoderStep dropout {self._decoder_lstm.dropout}')
         self._dropout_rnn = nn.Dropout(config.rnn_dropout)
 
         self._concat_layer = nn.Linear(config.decoder_size * 2, config.decoder_size, bias=False)
@@ -52,6 +53,7 @@ class LSTMDecoderStep(BaseDecoderStep):
         # hidden -- [n layers; batch size; decoder size]
         # output -- [batch size; 1; decoder size]
         rnn_output, (h_prev, c_prev) = self._decoder_lstm(embedded, (h_prev, c_prev))
+        #print('Fuck _dropout_rnn')
         rnn_output = self._dropout_rnn(rnn_output)
 
         # [batch size; context size]
@@ -70,5 +72,5 @@ class LSTMDecoderStep(BaseDecoderStep):
 
         # [batch size; vocab size]
         output = self._projection_layer(concat)
-
+        #output = encoder_output
         return output, attn_weights, (h_prev, c_prev)
