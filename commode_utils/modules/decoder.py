@@ -38,13 +38,12 @@ class Decoder(nn.Module):
             [output size; batch size; vocab size] -- sequence with logits for each position
             [output size; batch size; encoder seq length] -- sequence with attention weights for each position
         """
+
         batch_size = segment_sizes.shape[0]
         # encoder output -- [batch size; max context len; units]
         # attention mask -- [batch size; max context len]
-
         batched_encoder_output, attention_mask = cut_into_segments(encoder_output, segment_sizes, self._negative_value)
         decoder_state = self._decoder_step.get_initial_state(batched_encoder_output, attention_mask)
-        
         # [output size; batch size; vocab size]
         output = batched_encoder_output.new_zeros((output_size, batch_size, self._out_size))
         output[0, :, self._sos_token] = 1
