@@ -70,4 +70,5 @@ class LSTMDecoderStep(BaseDecoderStep):
 
         # [batch size; vocab size]
         output = self._projection_layer(concat)
+
         return output, attn_weights, (h_prev, c_prev)
