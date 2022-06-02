@@ -20,7 +20,6 @@ def cut_into_segments(
     :param mask_value:
     :return: [batch size; max context len; units], [batch size; max context len]
     """
-    #print(f'sample_sizes {sample_sizes}')
     batch_size = len(sample_sizes)
     max_context_len = max(sample_sizes)
 
