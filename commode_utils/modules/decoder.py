@@ -137,7 +137,7 @@ class Decoder(nn.Module):
 
             topk_for_cur_step = OrderedDict(Counter(new_prob_for_step).most_common(beam_width))
             temp = {x:y[0] for x, y in topk_for_cur_step.items()}
-            print(f'top {beam_width} for step {step} {temp} ')
+            #print(f'top {beam_width} for step {step} {temp} ')
             probs = topk_for_cur_step
 
         return probs
