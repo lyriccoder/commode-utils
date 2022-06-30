@@ -86,7 +86,7 @@ class Decoder(nn.Module):
             [output size; batch size; vocab size] -- sequence with logits for each position
             [output size; batch size; encoder seq length] -- sequence with attention weights for each position
         """
-        print(f'Eval method with beam {beam_width}')
+        #print(f'Eval method with beam {beam_width}')
         batch_size = segment_sizes.shape[0]
         # encoder output -- [batch size; max context len; units]
         # attention mask -- [batch size; max context len]
