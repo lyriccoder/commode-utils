@@ -74,7 +74,8 @@ class Decoder(nn.Module):
         segment_sizes: torch.LongTensor,
         output_size: int,
         beam_width: int,
-        target_sequence: torch.Tensor = None
+        target_sequence: torch.Tensor = None,
+        line: str = None
     ) -> Dict[str, float]:
         """Generate output sequence based on encoder output
 
@@ -115,7 +116,7 @@ class Decoder(nn.Module):
                 [tuple([x, decoder_state]) for x in topk_output.values.squeeze(0).tolist()]
             )
         )
-        
+        temp_values = {}
         for step in range(1, output_size):
             new_prob_for_step = {}
             for cur_seq, cur_val in probs.items():
@@ -135,8 +136,27 @@ class Decoder(nn.Module):
                     new_probs[new_seq] = (updated_prob, new_decoder_state)
                 new_prob_for_step = {**new_prob_for_step, **new_probs}
 
-            topk_for_cur_step = OrderedDict(Counter(new_prob_for_step).most_common(beam_width))
-            temp = {x:y[0] for x, y in topk_for_cur_step.items()}
+            try:
+                #print('###############################################')
+                #for x, y in new_prob_for_step.items():
+                    #temp_values[x] = y[0]
+                #topk_for_cur_step1 = OrderedDict(Counter(new_prob_for_step).most_common(beam_width))
+                topk_for_cur_step = OrderedDict(sorted(new_prob_for_step.items(), key= lambda j: j[1][0], reverse=True)[:beam_width])
+                #for x, y in topk_for_cur_step1.items():
+                    #temp_values[x] = y[0]
+                    #print(x, y[0])
+                #print(temp_values)
+                #print('***********************************************')
+                #for x, y in topk_for_cur_step.items():
+                    #temp_values[x] = y[0]
+                    #print(x, y[0], type(y))
+                #print(topk_for_cur_step)
+                #print('###############################################')
+            except RuntimeError as e:
+                print(f'Error: {line}, \n {str(e)}')
+                #print(f'FFFF {new_prob_for_step}')
+                #break
+            #temp = {x:y[0] for x, y in topk_for_cur_step.items()}
             #print(f'top {beam_width} for step {step} {temp} ')
             probs = topk_for_cur_step
 
