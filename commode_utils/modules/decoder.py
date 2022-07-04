@@ -136,27 +136,7 @@ class Decoder(nn.Module):
                     new_probs[new_seq] = (updated_prob, new_decoder_state)
                 new_prob_for_step = {**new_prob_for_step, **new_probs}
 
-            try:
-                #print('###############################################')
-                #for x, y in new_prob_for_step.items():
-                    #temp_values[x] = y[0]
-                #topk_for_cur_step1 = OrderedDict(Counter(new_prob_for_step).most_common(beam_width))
-                topk_for_cur_step = OrderedDict(sorted(new_prob_for_step.items(), key= lambda j: j[1][0], reverse=True)[:beam_width])
-                #for x, y in topk_for_cur_step1.items():
-                    #temp_values[x] = y[0]
-                    #print(x, y[0])
-                #print(temp_values)
-                #print('***********************************************')
-                #for x, y in topk_for_cur_step.items():
-                    #temp_values[x] = y[0]
-                    #print(x, y[0], type(y))
-                #print(topk_for_cur_step)
-                #print('###############################################')
-            except RuntimeError as e:
-                print(f'Error: {line}, \n {str(e)}')
-                #print(f'FFFF {new_prob_for_step}')
-                #break
-            #temp = {x:y[0] for x, y in topk_for_cur_step.items()}
+            topk_for_cur_step = OrderedDict(sorted(new_prob_for_step.items(), key= lambda j: j[1][0], reverse=True)[:beam_width])
             #print(f'top {beam_width} for step {step} {temp} ')
             probs = topk_for_cur_step
 
