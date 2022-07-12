@@ -6,6 +6,7 @@ from torch import nn
 
 from commode_utils.modules import LuongAttention
 from commode_utils.modules.base_decoder_step import BaseDecoderStep, DecoderState
+import torch.nn.functional as F
 
 
 class LSTMDecoderStep(BaseDecoderStep):
@@ -72,3 +73,40 @@ class LSTMDecoderStep(BaseDecoderStep):
         output = self._projection_layer(concat)
 
         return output, attn_weights, (h_prev, c_prev)
+
+
+    def test(
+        self,
+        input_token: torch.Tensor,
+        encoder_output: torch.Tensor,
+        attention_mask: torch.Tensor,
+        decoder_state: DecoderState,
+    ) -> Tuple[torch.Tensor, torch.Tensor, DecoderState]:
+        h_prev, c_prev = decoder_state
+
+        # [batch size; 1; embedding size]
+        embedded = self._target_embedding(input_token).unsqueeze(1)
+
+        # hidden -- [n layers; batch size; decoder size]
+        # output -- [batch size; 1; decoder size]
+        rnn_output, (h_prev, c_prev) = self._decoder_lstm(embedded, (h_prev, c_prev))
+        rnn_output = self._dropout_rnn(rnn_output)
+
+        # [batch size; context size]
+        attn_weights = self._attention(h_prev[-1], encoder_output, attention_mask)
+
+        # [batch size; 1; decoder size]
+        context = torch.bmm(attn_weights.unsqueeze(1), encoder_output)
+
+        # [batch size; 2 * decoder size]
+        concat_input = torch.cat([rnn_output, context], dim=2).squeeze(1)
+
+        # [batch size; decoder size]
+        concat = self._concat_layer(concat_input)
+        concat = self._norm(concat)
+        concat = torch.tanh(concat)
+
+        # [batch size; vocab size]
+        output = self._projection_layer(concat)
+        res = F.log_softmax(output, dim=1)
+        return res, attn_weights, (h_prev, c_prev)

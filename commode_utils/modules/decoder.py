@@ -102,7 +102,7 @@ class Decoder(nn.Module):
         current_input = batched_encoder_output.new_full((batch_size,), self._sos_token, dtype=torch.long)
         
         # get the SOS current_input
-        current_output, current_attention, decoder_state = self._decoder_step(
+        current_output, current_attention, decoder_state = self._decoder_step.test(
             current_input, batched_encoder_output, attention_mask, decoder_state
         )
         
@@ -124,7 +124,7 @@ class Decoder(nn.Module):
                 # get last symbol
                 last_token = cur_seq[-1]
                 current_input = batched_encoder_output.new_full((batch_size,), last_token, dtype=torch.long)
-                current_output, current_attention, new_decoder_state = self._decoder_step(
+                current_output, current_attention, new_decoder_state = self._decoder_step.test(
                         current_input, batched_encoder_output, attention_mask, cur_decoder_state
                 )
                 topk_output = current_output.topk(beam_width)
